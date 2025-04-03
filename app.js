@@ -5,28 +5,30 @@ const postRoutes = require('./routes/postRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+app.use(cors()); // Enable CORS
 
 // Swagger setup
 const swaggerOptions = {
-    definition: {
-      openapi: '3.0.0',
-      info: {
-        title: 'Express API Documentation',
-        version: '1.0.0',
-        description: 'API documentation for Users, Posts, and Comments',
-      },
-      servers: [
-        {
-          url: 'http://localhost:5000',
-          description: 'Local server',
-        },
-      ],
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Wanton District API Documentation',
+      version: '1.0.0',
+      description: 'API documentation for Wanton District',
     },
-    apis: ['./routes/*.js'], // Points to route files with Swagger comments
-  };
+    servers: [{ url: 'http://localhost:4000', description: 'Local server' }],
+    tags: [
+      { name: 'Users', description: 'User authentication and profile' },
+      { name: 'Posts', description: 'Post and Contents' },
+      { name: 'Comments', description: 'Comments and Discussions' }
+    ]
+  },
+  apis: ['./routes/*.js'],
+};
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
@@ -36,10 +38,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 
-mongoose.connect('mongodb://localhost:27017/mydatabase')
+// MongoDB Connection
+mongoose.connect('mongodb://127.0.0.1:27017/mydatabase')
   .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error(err));
+  .catch(err => console.error('MongoDB Connection Error:', err));
 
-app.listen(5000, () => console.log('Server running on port 5000'));
-
-
+app.listen(4000, () => console.log('Server running on port 4000'));
