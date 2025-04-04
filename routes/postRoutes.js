@@ -1,6 +1,8 @@
 const express = require('express');
-const { createPost, getAllPosts, getPostById } = require('../controllers/postController');
+const { createPost, getAllPosts, getPostById, updatePost, deletePost } = require('../controllers/postController');
+
 const router = express.Router();
+
 /**
  * @openapi
  * /api/posts:
@@ -25,8 +27,8 @@ const router = express.Router();
  *     responses:
  *       201:
  *         description: Post created successfully
- *       404:
- *         description: User not found
+ *       400:
+ *         description: Bad request - missing required fields
  *       500:
  *         description: Server error
  */
@@ -37,12 +39,18 @@ router.post('/', createPost);
  * /api/posts:
  *   get:
  *     summary: Get all posts
- *     description: Retrieves a list of all posts, including user details.
+ *     description: Retrieves a list of all posts, optionally filtered by user ID.
  *     tags:
  *       - Posts
+ *     parameters:
+ *       - name: userId
+ *         in: query
+ *         schema:
+ *           type: string
+ *         description: User ID to filter posts by user
  *     responses:
  *       200:
- *         description: List of posts
+ *         description: List of posts retrieved successfully
  *       500:
  *         description: Server error
  */
@@ -72,5 +80,62 @@ router.get('/', getAllPosts);
  */
 router.get('/:id', getPostById);
 
+/**
+ * @openapi
+ * /api/posts/{id}:
+ *   put:
+ *     summary: Update a post
+ *     description: Updates a post's title or content using its ID.
+ *     tags:
+ *       - Posts
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Post updated successfully
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/:id', updatePost);
+
+/**
+ * @openapi
+ * /api/posts/{id}:
+ *   delete:
+ *     summary: Delete a post
+ *     description: Deletes a post using its ID.
+ *     tags:
+ *       - Posts
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Post deleted successfully
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.delete('/:id', deletePost);
 
 module.exports = router;
